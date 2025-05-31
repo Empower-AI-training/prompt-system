@@ -119,15 +119,3 @@ const TEMPLATE_CONTENT = {
 **OBJECTIVE:** Create lead magnet system for [BUSINESS TYPE] converting 7-15% of visitors into engaged prospects.
 
 **PARAMETERS:**
-- Target audience: [SEGMENTS]
-- Value proposition: [PROPOSITION]
-- Business objectives: [OBJECTIVES]
-- Implementation resources: [RESOURCES]
-
-**FRAMEWORK:**
-1. **Foundation:** Audience analysis, conversion goals, value articulation, format selection
-2. **Content Development:** Irresistible promise, value density, actionability, consumption simplification
-3. **Conversion Optimization:** Landing page architecture, form design, trust elements, objection handling
-4. **Implementation:** Production efficiency, distribution strategy, follow-up sequences, performance measurement
-
-**ADHD ELEMENTS:** Visual architecture, multiple formats
