@@ -2164,3 +2164,649 @@ function App() {
                       >
                         <Copy className="h-3 w-3 inline mr-1" />
                         Copy
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({ type: 'UPDATE_TEMPLATE_USAGE', templateId: template.id });
+                          addQuickWin(`Used ${template.name}!`);
+                        }}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 disabled:opacity-50"
+                        disabled={state.isLoading}
+                      >
+                        Used
+                      </button>
+                    </div>
+                    
+                    {state.templateUsage[template.id] && (
+                      <div className="text-xs text-gray-500 mt-2">
+                        Used {state.templateUsage[template.id]} times
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Current Template Display */}
+              {currentTemplate && (
+                <div className="mt-6 p-4 border rounded-lg bg-gray-50">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className={`text-lg font-bold ${getCategoryColors(currentTemplate.category).text}`}>
+                        {currentTemplate.name}
+                      </h3>
+                      <div className="flex gap-2 text-sm mt-1">
+                        <span className={`px-2 py-1 rounded ${
+                          currentTemplate.energy === 'low' ? 'bg-green-100 text-green-800' :
+                          currentTemplate.energy === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {currentTemplate.energy} energy
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {currentTemplate.time}
+                        </span>
+                        <span className={`px-2 py-1 rounded ${
+                          currentTemplate.revenue === '7days' ? 'bg-green-100 text-green-800' :
+                          currentTemplate.revenue === '30days' ? 'bg-blue-100 text-blue-800' :
+                          'bg-purple-100 text-purple-800'
+                        }`}>
+                          {currentTemplate.revenue}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={copyTemplate}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium disabled:opacity-50 ${
+                        state.copied 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-purple-500 text-white hover:bg-purple-600'
+                      }`}
+                      disabled={state.isLoading}
+                    >
+                      {state.isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                      {state.copied ? 'Copied!' : 'Copy Template'}
+                    </button>
+                  </div>
+
+                  <div className="bg-white p-4 rounded border max-h-64 overflow-y-auto">
+                    <pre className="text-sm text-gray-800 whitespace-pre-wrap font-mono">
+                      {getTemplateContent(state.selectedTemplate)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Template Tracker Tab */}
+        {state.activeTab === 'tracker' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">📊 Template Performance Tracker</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="font-bold text-blue-800 mb-3">Track Template Usage</h3>
+                <select 
+                  value={state.selectedTemplate}
+                  onChange={(e) => updateField('selectedTemplate', e.target.value)}
+                  className="w-full p-2 border rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select a template...</option>
+                  {getAllTemplates().map(template => (
+                    <option key={template.id} value={template.id}>{template.name}</option>
+                  ))}
+                </select>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => {
+                      if (state.selectedTemplate) {
+                        dispatch({ type: 'UPDATE_TEMPLATE_USAGE', templateId: state.selectedTemplate });
+                        addQuickWin(`Used ${getCurrentTemplate()?.name}!`);
+                      }
+                    }}
+                    className="bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+                    disabled={!state.selectedTemplate || state.isLoading}
+                  >
+                    Mark as Used ✅
+                  </button>
+                  <button 
+                    onClick={() => updateMetrics({ timesSaved: state.metrics.timesSaved + 2 })}
+                    className="bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600 disabled:opacity-50"
+                    disabled={state.isLoading}
+                  >
+                    Saved 2 Hours ⏰
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h3 className="font-bold text-green-800 mb-3">💡 Pro Tips for ADHD Brains</h3>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li>• Track immediately after using (don't wait!)</li>
+                  <li>• Celebrate every small win - dopamine is fuel!</li>
+                  <li>• Use voice memos if typing feels like too much</li>
+                  <li>• Set a daily 5-minute "metrics check" alarm</li>
+                  <li>• Reward yourself after updating metrics</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-bold text-purple-800 mb-3">🎯 Template ROI Calculator</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Which templates are making you the most money per hour invested?
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white p-3 rounded border">
+                  <div className="text-lg font-bold text-green-600">Email Marketing</div>
+                  <div className="text-sm text-gray-600">$75/hour saved</div>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <div className="text-lg font-bold text-blue-600">Sales Scripts</div>
+                  <div className="text-sm text-gray-600">$125/hour saved</div>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <div className="text-lg font-bold text-purple-600">Content Creation</div>
+                  <div className="text-sm text-gray-600">$50/hour saved</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Revenue Goals Tab */}
+        {state.activeTab === 'revenue' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">💰 Revenue Goal Tracking</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-green-700 mb-4">🎯 Your Path to $100K</h3>
+                <ProgressBar 
+                  current={state.goals.revenue.current} 
+                  target={state.goals.revenue.target} 
+                  color="green" 
+                  label="Annual Revenue Goal"
+                />
+                <ProgressBar 
+                  current={state.goals.monthlyIncome.current} 
+                  target={state.goals.monthlyIncome.target} 
+                  color="blue" 
+                  label="Monthly Income Goal"
+                />
+                <ProgressBar 
+                  current={state.goals.weeklyIncome.current} 
+                  target={state.goals.weeklyIncome.target} 
+                  color="purple" 
+                  label="Weekly Income Goal"
+                />
+              </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-blue-50 p-4 rounded-lg">
+                <h3 className="font-bold text-green-800 mb-3">🚀 Revenue Milestones</h3>
+                <div className="space-y-3">
+                  <div className={`p-2 rounded ${state.goals.revenue.current >= 1000 ? 'bg-green-200' : 'bg-gray-100'}`}>
+                    <div className="font-medium">First $1,000 🎉</div>
+                    <div className="text-sm text-gray-600">You're officially in business!</div>
+                  </div>
+                  <div className={`p-2 rounded ${state.goals.revenue.current >= 5000 ? 'bg-green-200' : 'bg-gray-100'}`}>
+                    <div className="font-medium">$5,000 Mark 💪</div>
+                    <div className="text-sm text-gray-600">Momentum is building!</div>
+                  </div>
+                  <div className={`p-2 rounded ${state.goals.revenue.current >= 10000 ? 'bg-green-200' : 'bg-gray-100'}`}>
+                    <div className="font-medium">$10,000 Milestone 🚀</div>
+                    <div className="text-sm text-gray-600">This is getting serious!</div>
+                  </div>
+                  <div className={`p-2 rounded ${state.goals.revenue.current >= 25000 ? 'bg-green-200' : 'bg-gray-100'}`}>
+                    <div className="font-medium">$25,000 Quarter 💎</div>
+                    <div className="text-sm text-gray-600">You're a real entrepreneur!</div>
+                  </div>
+                  <div className={`p-2 rounded ${state.goals.revenue.current >= 50000 ? 'bg-green-200' : 'bg-gray-100'}`}>
+                    <div className="font-medium">$50,000 Halfway 🔥</div>
+                    <div className="text-sm text-gray-600">The finish line is in sight!</div>
+                  </div>
+                  <div className={`p-2 rounded ${state.goals.revenue.current >= 100000 ? 'bg-yellow-200' : 'bg-gray-100'}`}>
+                    <div className="font-medium">$100,000 GOAL! 👑</div>
+                    <div className="text-sm text-gray-600">YOU DID IT! Time to celebrate!</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h3 className="font-bold text-yellow-800 mb-3">📊 Quick Revenue Updates</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input 
+                  type="number" 
+                  placeholder="Daily revenue"
+                  className="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const value = validatePositiveNumber(e.target.value);
+                      if (value > 0) {
+                        handleRevenueInput(value);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                  disabled={state.isLoading}
+                />
+                <button 
+                  onClick={() => handleRevenueInput(100)}
+                  className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+                  disabled={state.isLoading}
+                >
+                  Quick +$100
+                </button>
+                <button 
+                  onClick={() => handleRevenueInput(500)}
+                  className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+                  disabled={state.isLoading}
+                >
+                  Big Win +$500
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Business Health Tab */}
+        {state.activeTab === 'health' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">📈 Business Health Monitor</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="font-bold text-blue-800 mb-3">💡 Productivity Health</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Templates Used</span>
+                    <span className="font-bold text-blue-600">{state.metrics.templatesUsed}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Hours Saved</span>
+                    <span className="font-bold text-green-600">{Math.round(state.metrics.timesSaved)}h</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Success Level</span>
+                    <span className="font-bold text-yellow-600">
+                      {state.metrics.templatesUsed > 10 ? 'High 🚀' : state.metrics.templatesUsed > 5 ? 'Medium 📈' : 'Getting Started 🌱'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h3 className="font-bold text-green-800 mb-3">💰 Financial Health</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Total Revenue</span>
+                    <span className="font-bold text-green-600">${state.goals.revenue.current.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Goal Progress</span>
+                    <span className="font-bold text-blue-600">{getProgressPercentage(state.goals.revenue.current, state.goals.revenue.target).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Financial Status</span>
+                    <span className="font-bold text-purple-600">
+                      {state.goals.revenue.current > 50000 ? 'Excellent 💎' : state.goals.revenue.current > 10000 ? 'Strong 💪' : 'Building 🏗️'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <h3 className="font-bold text-purple-800 mb-3">🎯 Progress Health</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Quick Wins</span>
+                    <span className="font-bold text-green-600">{state.quickWins.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Favorites</span>
+                    <span className="font-bold text-blue-600">{state.favorites.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Momentum Score</span>
+                    <span className="font-bold text-purple-600">
+                      {state.quickWins.length > 15 ? 'High 🚀' : state.quickWins.length > 5 ? 'Medium 📈' : 'Starting 🌱'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Favorites Tab */}
+        {state.activeTab === 'favorites' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">⭐ My Favorite Templates</h2>
+            
+            {state.favorites.length === 0 ? (
+              <div className="text-center py-12">
+                <Star className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                <h3 className="text-lg font-medium text-gray-500 mb-2">No favorites yet!</h3>
+                <p className="text-gray-400 mb-4">Start adding templates to your favorites by clicking the star icon.</p>
+                <button 
+                  onClick={() => updateField('activeTab', 'templates')}
+                  className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600"
+                >
+                  Browse Templates
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {state.favorites.map(templateId => {
+                  const template = getAllTemplates().find(t => t.id === templateId);
+                  if (!template) return null;
+                  
+                  return (
+                    <div key={templateId} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-gray-800">{template.name}</h3>
+                        <button
+                          onClick={() => toggleFavorite(templateId)}
+                          className="text-yellow-500"
+                        >
+                          <Star className="h-5 w-5" fill="currentColor" />
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1 text-xs mb-3">
+                        <span className={`px-2 py-1 rounded-full ${
+                          template.energy === 'low' ? 'bg-green-100 text-green-800' :
+                          template.energy === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {template.energy} energy
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                          {template.time}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full ${
+                          template.revenue === '7days' ? 'bg-green-100 text-green-800' :
+                          template.revenue === '30days' ? 'bg-blue-100 text-blue-800' :
+                          'bg-purple-100 text-purple-800'
+                        }`}>
+                          {template.revenue}
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            updateField('selectedTemplate', templateId);
+                            updateField('activeTab', 'templates');
+                          }}
+                          className="flex-1 bg-purple-500 text-white px-3 py-1 rounded text-sm hover:bg-purple-600"
+                        >
+                          View Template
+                        </button>
+                        <button
+                          onClick={() => {
+                            dispatch({ type: 'UPDATE_TEMPLATE_USAGE', templateId });
+                            addQuickWin(`Used ${template.name}!`);
+                          }}
+                          className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                        >
+                          Mark Used
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Quick Wins Tab */}
+        {state.activeTab === 'wins' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">🎉 Quick Wins Tracker</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-bold text-green-700 mb-4">Add a New Win!</h3>
+                <div className="space-y-3">
+                  <input 
+                    type="text" 
+                    placeholder="What did you accomplish today?"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && e.target.value.trim()) {
+                        addQuickWin(e.target.value.trim());
+                        e.target.value = '';
+                      }
+                    }}
+                    disabled={state.isLoading}
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <button 
+                      onClick={() => addQuickWin('Completed a template!')}
+                      className="bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+                      disabled={state.isLoading}
+                    >
+                      Used Template ✅
+                    </button>
+                    <button 
+                      onClick={() => addQuickWin('Made progress on project!')}
+                      className="bg-green-500 text-white px-3 py-2 rounded text-sm hover:bg-green-600 disabled:opacity-50"
+                      disabled={state.isLoading}
+                    >
+                      Project Progress 🚀
+                    </button>
+                    <button 
+                      onClick={() => addQuickWin('Learned something new!')}
+                      className="bg-purple-500 text-white px-3 py-2 rounded text-sm hover:bg-purple-600 disabled:opacity-50"
+                      disabled={state.isLoading}
+                    >
+                      New Learning 🧠
+                    </button>
+                    <button 
+                      onClick={() => addQuickWin('Took care of myself!')}
+                      className="bg-pink-500 text-white px-3 py-2 rounded text-sm hover:bg-pink-600 disabled:opacity-50"
+                      disabled={state.isLoading}
+                    >
+                      Self-Care 💚
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-purple-700 mb-4">🌟 Recent Wins</h3>
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {state.quickWins.map(win => (
+                    <div key={win.id} className="bg-gradient-to-r from-purple-50 to-blue-50 p-3 rounded-lg border">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <span className="text-lg mr-2">{win.celebration}</span>
+                          <span className="text-gray-800">{win.text}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">{win.date}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {state.quickWins.length === 0 && (
+                  <div className="text-center text-gray-500 py-8">
+                    <span className="text-4xl">🌟</span>
+                    <p className="mt-2">Your wins will appear here!</p>
+                    <p className="text-sm">Add your first win above.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-6 bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg">
+              <h3 className="font-bold text-orange-800 mb-3">🏆 Win Streak Rewards</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className={`p-3 rounded text-center ${state.quickWins.length >= 3 ? 'bg-yellow-200' : 'bg-gray-100'}`}>
+                  <div className="text-2xl">🥉</div>
+                  <div className="text-sm font-medium">3 Wins</div>
+                  <div className="text-xs">Getting Started!</div>
+                </div>
+                <div className={`p-3 rounded text-center ${state.quickWins.length >= 7 ? 'bg-gray-300' : 'bg-gray-100'}`}>
+                  <div className="text-2xl">🥈</div>
+                  <div className="text-sm font-medium">7 Wins</div>
+                  <div className="text-xs">Building Momentum!</div>
+                </div>
+                <div className={`p-3 rounded text-center ${state.quickWins.length >= 15 ? 'bg-yellow-400' : 'bg-gray-100'}`}>
+                  <div className="text-2xl">🥇</div>
+                  <div className="text-sm font-medium">15 Wins</div>
+                  <div className="text-xs">On Fire!</div>
+                </div>
+                <div className={`p-3 rounded text-center ${state.quickWins.length >= 30 ? 'bg-purple-400' : 'bg-gray-100'}`}>
+                  <div className="text-2xl">👑</div>
+                  <div className="text-sm font-medium">30 Wins</div>
+                  <div className="text-xs">Legend Status!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Monthly Review Tab */}
+        {state.activeTab === 'monthly' && (
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold text-purple-800 mb-6">📅 Monthly Business Review</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-green-800 mb-3">✅ What Went Well This Month</h3>
+                  <textarea 
+                    className="w-full h-24 p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Celebrate your wins! What are you proud of?"
+                  ></textarea>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-blue-800 mb-3">📈 Key Metrics This Month</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Revenue Generated:</span>
+                      <input 
+                        type="number" 
+                        className="w-20 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        placeholder="$0" 
+                        onChange={(e) => {
+                          const value = validatePositiveNumber(e.target.value);
+                          if (value > 0) {
+                            updateMetrics({ monthlyRevenue: value });
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Templates Used:</span>
+                      <span className="w-20 px-2 py-1 bg-gray-100 rounded text-sm text-center">{state.metrics.templatesUsed}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Projects Completed:</span>
+                      <span className="w-20 px-2 py-1 bg-gray-100 rounded text-sm text-center">{state.metrics.projectsCompleted}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Hours Saved:</span>
+                      <span className="w-20 px-2 py-1 bg-gray-100 rounded text-sm text-center">{Math.round(state.metrics.timesSaved)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-yellow-800 mb-3">🎯 Areas for Improvement</h3>
+                  <textarea 
+                    className="w-full h-24 p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                    placeholder="What could be better? No judgment, just growth!"
+                  ></textarea>
+                </div>
+
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-purple-800 mb-3">🚀 Next Month's Goals</h3>
+                  <div className="space-y-2">
+                    <input 
+                      type="text" 
+                      className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Goal 1: Increase revenue by..."
+                    />
+                    <input 
+                      type="text" 
+                      className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Goal 2: Use 5 new templates..."
+                    />
+                    <input 
+                      type="text" 
+                      className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="Goal 3: Complete project..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+              <h3 className="font-bold text-green-800 mb-3">📊 Monthly Progress Summary</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{getProgressPercentage(state.goals.revenue.current, state.goals.revenue.target / 12).toFixed(0)}%</div>
+                  <div className="text-sm text-gray-600">Monthly Revenue Goal</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{state.metrics.templatesUsed}</div>
+                  <div className="text-sm text-gray-600">Templates Mastered</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{state.metrics.projectsCompleted}</div>
+                  <div className="text-sm text-gray-600">Projects Shipped</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{state.quickWins.length}</div>
+                  <div className="text-sm text-gray-600">Wins Celebrated</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
+              <button 
+                onClick={() => addQuickWin('Completed monthly review! 📊')}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-blue-600 disabled:opacity-50"
+                disabled={state.isLoading}
+              >
+                Complete Monthly Review 💾
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-gray-500 text-sm">
+          <p>🧠 Designed specifically for ADHD entrepreneurs pursuing $100K+ annual revenue</p>
+          <p className="mt-1">
+            From <a href="https://empoweraitraining.com" className="text-purple-600 hover:underline">EmpowerAI Training</a> • 
+            Progress over perfection! 🚀
+          </p>
+          <div className="mt-2 flex flex-wrap justify-center gap-4 text-xs">
+            <span>💾 Data stored in browser memory</span>
+            <span>📥 Export your data anytime</span>
+            <span>⭐ {state.favorites.length} favorites saved</span>
+            <span>🎯 ${state.goals.revenue.current.toLocaleString()} toward $100K goal</span>
+            <span>📊 {Object.keys(TEMPLATE_CONTENT).length} templates available</span>
+          </div>
+        </div>
+      </div>
+    </ErrorBoundary>
+  );
+}
+
+}
+
+export default App;
